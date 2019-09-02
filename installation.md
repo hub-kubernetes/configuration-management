@@ -107,6 +107,8 @@ Start puppet agent
 
 ```
 /opt/puppetlabs/bin/puppet resource service puppet ensure=running enable=true
+
+systemctl restart puppet
 ```
 
 ## Go back to master 
