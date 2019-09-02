@@ -261,9 +261,9 @@ Add the below lines -
 ```
 class useraccount {
 
-  user { 'username':
+  user { 'testuser':
     ensure      => present,
-    home        => '/home/username',
+    home        => '/home/testuser',
     shell       => '/bin/bash',
     managehome  => true,
     gid         => 'username',
