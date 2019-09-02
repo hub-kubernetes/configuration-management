@@ -347,6 +347,37 @@ Execute the below command to apply your changes -
 /opt/puppetlabs/bin/puppet apply init.pp
 ```
 
+Apply changes to agent nodes now - 
+
+```
+cd ../manifests
+vi site.pp
+```
+
+Add the below lines - 
+
+```
+node default {
+
+}
+
+node 'YOUR_MASTER_NAME' {
+  # ...
+}
+
+node 'YOUR_SLAVE_NAME' {
+
+  include useraccount
+}
+```
+
+On **Agent** machine run the below to avoid wait time for polling 
+
+```
+/opt/puppetlabs/bin/puppet agent -t
+
+```
+
 
 
 
