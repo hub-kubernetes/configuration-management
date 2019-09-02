@@ -40,7 +40,7 @@ sed -i 's/2g/512m/g' /etc/default/puppetserver
 * Add configuration to puppetserver 
 
 ```
-echo "dns_alt_names = puppetserver" >>/etc/puppetlabs/puppet/puppet.conf
+echo "dns_alt_names = YOUR_MASTER_NAME" >>/etc/puppetlabs/puppet/puppet.conf
 
 vi /etc/puppetlabs/puppet/puppet.conf
 ```
@@ -96,6 +96,7 @@ vi /etc/puppetlabs/puppet/puppet.conf
 Add the below lines - 
 
 ```
+[main]
 certname = YOUR_SLAVE_NAME
 server = YOUR_MASTER_NAME
 environment = production
