@@ -266,7 +266,7 @@ class useraccount {
     home        => '/home/testuser',
     shell       => '/bin/bash',
     managehome  => true,
-    gid         => 'username',
+    gid         => 'testuser',
   }
 
 }
