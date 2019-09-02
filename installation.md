@@ -147,17 +147,205 @@ List all certificates
 
 * Test server - agent 
 
+On the agent run the below - 
+
 ```
 /opt/puppetlabs/bin/puppet agent --test
 ```
 
 ## Create your first manifest file 
 
-```
+On the master 
 
 ```
+vi /etc/puppetlabs/code/environments/production/manifests/site.pp
+```
+
+Add the below lines to the file - 
+
+```
+node 'YOUR_SLAVE_NAME' { # Applies only to mentioned node. If nothing mentioned, applies to all.
+     file { '/tmp/puppetdir': # Resource type file
+             ensure => 'directory', # Create as a diectory
+             owner => 'root', # Ownership
+             group => 'root', # Group Name
+             mode => '0755', # Directory permissions
+          }
+}
+```
+
+On the agent server run - 
+
+```
+/opt/puppetlabs/bin/puppet agent --test
+```
+
+## Install packages with puppet - 
+
+Install mysql client 
+
+```
+vi /etc/puppetlabs/code/environments/production/manifests/site.pp
+```
+
+Add the below lines - 
+
+```
+ package { 'mysql-client' :
+    ensure => present,
+  }
+
+```
+
+On the agent server run - 
+
+```
+/opt/puppetlabs/bin/puppet agent --test
+```
+
+Install docker engine with puppet 
+
+```
+vi /etc/puppetlabs/code/environments/production/manifests/site.pp
+```
+
+Add the below lines - 
 
 
+```
+ package { 'docker.io' :
+    ensure => present,
+  }
+
+```
+
+On the agent server run - 
+
+```
+/opt/puppetlabs/bin/puppet agent --test
+```
+
+
+## Working with modules in puppet
+
+Create a user with puppet
+
+```
+cd /etc/puppetlabs/code/environments/production/modules/
+mkdir useraccount
+cd useraccount
+mkdir {examples,files,manifests,templates}
+
+```
+
+What are these directories - 
+
+* manifests -	The Puppet code which powers the module
+* files -	Static files to be copied to managed nodes
+* templates - 	Template files to be copied to managed nodes that can e customized with variables
+* examples -	Example code which shows how to use the module
+
+
+> Any file which contains Puppet code is called a manifest, and each manifest file ends in .pp. When located inside a module, a manifest should only define one class. If a module’s manifests directory has an init.pp file, the class definition it contains is considered the main class for the module. The class definition inside init.pp should have the same name as the module.
+
+
+```
+cd manifests
+vi init.pp
+```
+
+Add the below lines - 
+
+```
+class useraccount {
+
+  user { 'username':
+    ensure      => present,
+    home        => '/home/username',
+    shell       => '/bin/bash',
+    managehome  => true,
+    gid         => 'username',
+  }
+
+}
+```
+Save the file
+
+To create the group - now create a new file - groups.pp 
+
+```
+vi groups.pp
+```
+
+Add the below lines 
+
+```
+
+class useraccount::groups {
+
+  group { 'testuser':
+    ensure  => present,
+  }
+
+}
+
+```
+
+Now reference the groups class inside init.pp
+
+```
+vi init.pp
+```
+
+Add the below lines just after **class useraccount**
+```
+  include useraccount::groups
+
+```
+
+Your final file should look like below - 
+
+```
+class useraccount {
+  include useraccount::groups
+
+  user { 'testuser':
+    ensure      => present,
+    home        => '/home/testuser',
+    shell       => '/bin/bash',
+    managehome  => true,
+    gid         => 'testuser',
+  }
+
+}
+
+```
+
+Perform a test run of your files - 
+
+```
+cd ../examples
+vi init.pp
+```
+
+Add the below line - 
+
+```
+include useraccount
+```
+
+Run the below command to perform a dry run - 
+
+```
+/opt/puppetlabs/bin/puppet apply --noop init.pp
+
+```
+
+Execute the below command to apply your changes - 
+
+```
+/opt/puppetlabs/bin/puppet apply init.pp
+```
 
 
 
