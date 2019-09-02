@@ -373,6 +373,20 @@ node 'YOUR_SLAVE_NAME' {
 }
 ```
 
+Now - add the include statement to site.pp at /etc/puppetlabs/code/environments/production/manifests
+
+```
+cd ../../../manifests/
+vi site.pp
+```
+
+Add the below lines - 
+
+```
+include useraccount
+
+```
+
 On **Agent** machine run the below to avoid wait time for polling 
 
 ```
