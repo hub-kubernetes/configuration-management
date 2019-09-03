@@ -38,6 +38,8 @@ cat id_rsa.pub
 
 sudo -i 
 
+cd .ssh
+
 # Copy the content of id_rsa.pub from master to authorized_keys file 
 
 echo "CONTENT_OF_MASTER_id_rsa.pub" >> authorized_keys
