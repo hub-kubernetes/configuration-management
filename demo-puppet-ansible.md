@@ -128,9 +128,202 @@ ansible database -m apt -a "name=docker.io state=latest"
 
 > Modules are self-contained bundles of code and data. You can download pre-built modules from the Puppet Forge or you can write your own modules. You create modules with set of code required to set up your infrastructure
 
+### Puppet module to add user 
+
+On Puppet master - 
+
+```
+cd /etc/puppetlabs/code/environments/production/modules/
+mkdir useraccount
+cd useraccount
+mkdir {examples,files,manifests,templates}
+
+```
 
 
+What are these directories - 
 
+* manifests -	The Puppet code which powers the module
+* files -	Static files to be copied to managed nodes
+* templates - 	Template files to be copied to managed nodes that can e customized with variables
+* examples -	Example code which shows how to use the module
+
+
+> Any file which contains Puppet code is called a manifest, and each manifest file ends in .pp. When located inside a module, a manifest should only define one class. If a module’s manifests directory has an init.pp file, the class definition it contains is considered the main class for the module. The class definition inside init.pp should have the same name as the module.
+
+
+```
+cd manifests
+vi init.pp
+```
+
+Add the below lines - 
+
+```
+class useraccount {
+
+  user { 'testuser':
+    ensure      => present,
+    home        => '/home/testuser',
+    shell       => '/bin/bash',
+    managehome  => true,
+    gid         => 'testuser',
+  }
+
+}
+```
+Save the file
+
+To create the group - now create a new file - groups.pp 
+
+```
+vi groups.pp
+```
+Add the below lines 
+
+```
+
+class useraccount::groups {
+
+  group { 'testuser':
+    ensure  => present,
+  }
+
+}
+
+```
+
+Now reference the groups class inside init.pp
+
+```
+vi init.pp
+```
+
+Add the below lines just after **class useraccount**
+```
+  include useraccount::groups
+
+```
+
+Your final file should look like below - 
+
+```
+class useraccount {
+  include useraccount::groups
+
+  user { 'testuser':
+    ensure      => present,
+    home        => '/home/testuser',
+    shell       => '/bin/bash',
+    managehome  => true,
+    gid         => 'testuser',
+  }
+
+}
+
+```
+
+Perform a test run of your files - 
+
+```
+cd ../examples
+vi init.pp
+```
+
+
+Add the below line - 
+
+```
+include useraccount
+```
+
+Run the below command to perform a dry run - 
+
+```
+/opt/puppetlabs/bin/puppet apply --noop init.pp
+
+```
+
+Execute the below command to apply your changes - 
+
+```
+/opt/puppetlabs/bin/puppet apply init.pp
+```
+
+Apply changes to agent nodes now - 
+
+dd the include statement to site.pp at /etc/puppetlabs/code/environments/production/manifests
+
+```
+cd ../../../manifests/
+vi site.pp
+```
+
+```
+node default {
+
+}
+
+node 'YOUR_MASTER_NAME' {
+  # ...
+}
+
+node 'YOUR_SLAVE_NAME' {
+
+  include useraccount
+}
+```
+
+On **Agent** machine run the below to avoid wait time for polling 
+
+```
+/opt/puppetlabs/bin/puppet agent -t
+
+```
+
+---
+
+## Working with Ansible playbook 
+
+> Ansible Playbook is a set of instructions that you send to run on a single or group of server hosts. It represents the ansible-provisioning, where the automation is defined as tasks, and all jobs like installing packages, editing files, will be done by ansible modules.
+
+> The Ansible Playbook contains some basic configuration, including hosts and user information of the provision servers, a task list that will be implemented to the provision servers, template and custom configurations, and a group of variables part of templates and tasks.
+
+### Ansible playbook to add a user - 
+
+Create a file user.yaml on master - 
+
+```
+vi user.yaml
+```
+
+Add the below lines - 
+
+```
+---
+- name: Add User
+  hosts: slave
+  gather_facts: true
+
+  tasks:
+
+  - name: Create a login user
+    user:
+      name: ansibleuser
+      state: present
+      shell: /bin/bash       # Defaults to /bin/bash
+      system: no             # Defaults to no
+      createhome: yes        # Defaults to yes
+      home: /home/ansibleuser  # Defaults to /home/<username>
+
+
+```
+
+From master execute - 
+
+```
+ansible-playbook user.yaml
+```
 
 
 
