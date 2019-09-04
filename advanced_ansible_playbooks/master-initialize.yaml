@@ -2,7 +2,7 @@
 - hosts: master
   tasks:
   - name: Initialize the Kubernetes cluster using kubeadm
-    command: kubeadm init --apiserver-advertise-address="10.142.0.24" --pod-network-cidr=192.168.0.0/16
+    command: kubeadm init --apiserver-advertise-address="10.138.0.2" --pod-network-cidr=192.168.0.0/16
 
   - name: Setup kubeconfig for root user
     command: "{{ item }}"
@@ -13,8 +13,12 @@
 
   - name: Install calico pod network
     become: false
-    command: kubectl create -f https://docs.projectcalico.org/v3.4/getting-started/kubernetes/installation/hosted/calico.yaml
+    command: kubectl apply -f https://docs.projectcalico.org/v3.3/getting-started/kubernetes/installation/hosted/rbac-kdd.yaml
+  - name: Install calico pod network
+    become: false
+    command: kubectl apply -f https://docs.projectcalico.org/v3.3/getting-started/kubernetes/installation/hosted/kubernetes-datastore/calico-networking/1.7/calico.yaml
 
+ 
   - name: Generate join command
     command: kubeadm token create --print-join-command
     register: join_command
