@@ -1,6 +1,6 @@
 ---
 - name: Jenkins Installation Demo
-  hosts: slave
+  hosts: slave2
   gather_facts: true
 
   tasks:
@@ -26,21 +26,23 @@
         name: openjdk-8-jdk
         state: latest
 
-    - name: Add apt repository to /etc/apt/sources.list
-      apt_repository:
-        repo: deb https://pkg.jenkins.io/debian-stable binary/
-        state: present
-
     - name: Install GPG Key
       apt_key:
         url: https://pkg.jenkins.io/debian-stable/jenkins.io.key
         state: present
 
+
+    - name: Add apt repository to /etc/apt/sources.list
+      apt_repository:
+        repo: deb https://pkg.jenkins.io/debian-stable binary/
+        state: present
+
+
     - name: Run apt-get update
       apt:
         update_cache: yes
 
-    - name: Update repositories cache and install "foo" package
+    - name: Update repositories cache and install "jenkins" package
       apt:
         name: jenkins
         update_cache: yes
@@ -50,4 +52,13 @@
       apt:
         name: jenkins
         state: latest
+
+    - name: get ansible initial admin password
+      command: "cat /var/lib/jenkins/secrets/initialAdminPassword"
+      register: key
+
+    - name: show key contents
+      debug:
+        var: key.stdout
+
 
