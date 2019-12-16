@@ -73,11 +73,11 @@ ansible all -m shell -a "apt-get update && apt-get remove  -y mysql-client"
 11. Install a package using apt module 
 
 ```
-ansible all -s -m apt -a "name=nginx state=installed"
+ansible all  -m apt -a "name=nginx state=latest"
 
 # to remove 
 
-ansible all -s -m apt -a "name=nginx state=absent"
+ansible all  -m apt -a "name=nginx state=absent"
 ```
 
 12. Start and Stop service 
