@@ -88,8 +88,29 @@ ansible all -m service -a "name=nginx state=started enabled=yes"
 ansible all -m service -a "name=nginx state=stopped enabled=yes"
 ```
 
+13. Fetch files from remote servers 
 
+```
+ansible all -m fetch -a "src=/etc/hosts dest=/home/weblogic/"
+```
 
+14. Copy files to remote servers 
 
+```
+ansible all -m copy -a "src=/etc/hosts dest=/tmp/"
+```
+
+15. Create symlinks 
+
+```
+ansible all -b -m file -a "src=/tmp/hosts dest=/home/weblogic/hosts owner=root group=root state=link force=yes"
+```
+
+16. Delete files/directories
+
+```
+ansible all -m file -a "dest=/tmp/test.txt state=absent"
+
+```
 
 
